@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Publis</title>
+    <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-[#04456c] via-[#391334] to-[#04244c]">
+    <!-- Header with Navigation and Profile -->
+    <div class="fixed top-0 left-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 shadow-lg z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex gap-4">
+                <button onclick="history.back()" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    ← Voltar
+                </button>
+                <a href="home.html" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    Início
+                </a>
+            </div>
+            <div class="flex gap-4">
+                <a href="profile.html" class="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
+                    Perfil
+                </a>
+                <button onclick="logout()" class="px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors">
+                    Sair
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="container mx-auto px-4 py-8 max-w-3xl mt-20">
+        <h1 class="text-4xl font-bold text-center mb-8 text-white drop-shadow-sm">Calculadora de Publis</h1>
+
+        <div class="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-200 text-white rounded-2xl shadow-xl p-8 mb-8 border border-pink-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-300">
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2 text-black">Número de Seguidores</label>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" v-model="followers" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all text-black" min="0">
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center gap-2">
+                    <label class="block text-sm font-medium mb-2 text-black">Escopo</label>
+                    <div class="tooltip">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="tooltip-text">Se o escopo de entrega for pequeno o valor será cobrado normal, caso seja um escopo maior é adicionado um pequeno desconto para que haja um incentivo da marca a fechar mais coisas</span>
+                    </div>
+                </div>
+                <select v-model="scope" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all appearance-none bg-white text-black">
+                    <option value="small">Pequeno</option>
+                    <option value="large">Grande</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <label class="block text-sm font-medium mb-2 text-black">Alcance Mínimo (%)</label>
+                        <div class="tooltip">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="tooltip-text">Pegue a % de um vídeo recente que teve pouco alcance. Ex: Se você tem 50k e seu vídeo recente com menos alcance foi 5k, então é 10%</span>
+                        </div>
+                    </div>
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" v-model="minReach" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all text-black" min="0" max="100">
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <label class="block text-sm font-medium mb-2 text-black">Alcance Máximo (%)</label>
+                        <div class="tooltip">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span class="tooltip-text">Pegue a % de um vídeo recente que teve mais alcance. Ex: Se você tem 50k e seu vídeo recente com mais alcance foi 75k, então é 150%</span>
+                        </div>
+                    </div>
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" v-model="maxReach" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all text-black" min="0" max="100">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center gap-2">
+                    <label class="block text-sm font-medium mb-2 text-black">Taxa de Engajamento (%)</label>
+                    <div class="tooltip">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="tooltip-text">Pegue a porcentagem de engajamento no seu conteúdo com comentários</span>
+                    </div>
+                </div>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" v-model="engagement" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all text-black" min="0" max="100">
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center gap-2">
+                    <label class="block text-sm font-medium mb-2 text-black">Dias de Licenciamento de Imagem</label>
+                    <div class="tooltip">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="tooltip-text">Quantos dias essa campanha vai rodar? Coloque a quantidade de dias que vai ser usado</span>
+                    </div>
+                </div>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" v-model="licenseDays" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all text-black" min="1">
+            </div>
+
+            <div class="mb-6">
+                <div class="flex items-center gap-2">
+                    <label class="block text-sm font-medium mb-2 text-black">Cliente pediu desconto?</label>
+                    <div class="tooltip">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="tooltip-text">Caso o cliente retorne pedindo desconto preencha novamente e adicione Sim, o orçamento terá um desconto de 10%</span>
+                    </div>
+                </div>
+                <select v-model="hasDiscount" class="w-full p-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none transition-all appearance-none bg-white text-black">
+                    <option value="no">Não</option>
+                    <option value="yes">Sim</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-200 text-white rounded-2xl shadow-xl p-8 border border-pink-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-300">
+            <h2 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">VALORES STORIES</h2>
+            <p class="text-sm text-gray-700 mb-4">Valor referente a 1 unidade de stories</p>
+
+            <div class="space-y-4">
+                <div class="pt-4">
+                    <div v-if="hasDiscount === 'yes'" class="flex justify-between items-center text-lg mb-2">
+                        <span class="text-black">Valor Original:</span>
+                        <span class="text-black line-through">R$ {{ formatCurrency(totalValue) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold">
+                        <span class="text-black">Valor Total{{ hasDiscount === 'yes' ? ' com Desconto' : '' }}:</span>
+                        <span class="text-black">R$ {{ formatCurrency(finalValue) }}</span>
+                    </div>
+                    <div v-if="hasDiscount === 'yes'" class="text-sm text-green-700 text-right mt-1">
+                        Desconto de 10% aplicado
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-200 text-white rounded-2xl shadow-xl p-8 mt-8 border border-pink-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-300">
+            <h2 class="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">VALORES REELS</h2>
+
+            <div class="space-y-4">
+                <div class="pt-4">
+                    <div v-if="hasDiscount === 'yes'" class="flex justify-between items-center text-lg mb-2">
+                        <span class="text-black">Valor Original:</span>
+                        <span class="text-black line-through">R$ {{ formatCurrency(totalValue * 2) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold">
+                        <span class="text-black">Valor Total{{ hasDiscount === 'yes' ? ' com Desconto' : '' }}:</span>
+                        <span class="text-black">R$ {{ formatCurrency(finalReelsValue) }}</span>
+                    </div>
+                    <div v-if="hasDiscount === 'yes'" class="text-sm text-green-700 text-right mt-1">
+                        Desconto de 10% aplicado
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-purple-300 via-pink-300 to-orange-200 text-white rounded-2xl shadow-xl p-8 mt-8 border border-pink-100 hover:border-pink-300 hover:shadow-2xl transition-all duration-300">
+            <div class="flex items-center justify-between gap-4">
+                <button @click="showSavePrompt" :disabled="loading" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:opacity-90 disabled:opacity-50 transition-all duration-300 flex items-center gap-2 font-medium">
+                    <span v-if="loading" class="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                    {{ loading ? 'Salvando...' : 'Salvar Cálculo' }}
+                </button>
+                <button @click="toggleHistory" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 flex items-center gap-2 font-medium">
+                    Ver Histórico
+                </button>
+                <span v-if="lastSavedAt" class="text-sm text-black/60">Último salvamento: {{ lastSavedAt }}</span>
+            </div>
+        </div>
+
+        <!-- Save Name Prompt -->
+        <div v-if="showSaveDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-2xl p-6 max-w-md w-full">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">Salvar Cálculo</h3>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome do Cálculo</label>
+                    <input 
+                        type="text" 
+                        v-model="saveName"
+                        class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 outline-none"
+                        placeholder="Digite um nome para identificar este cálculo"
+                    >
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button 
+                        @click="cancelSave"
+                        class="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        @click="saveCalculation"
+                        class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:opacity-90"
+                    >
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Popup -->
+        <div v-if="showHistory" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto relative">
+                <button @click="toggleHistory" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <h3 class="text-2xl font-bold mb-6 text-gray-800">Histórico de Cálculos</h3>
+                <div v-if="history.length === 0" class="text-center py-8 text-gray-600">
+                    Nenhum cálculo salvo ainda
+                </div>
+                <div v-else class="space-y-4">
+                    <div v-for="(calc, index) in history" :key="index" class="border rounded-xl p-4 hover:bg-gray-50">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-lg font-medium text-gray-800 mb-2">{{ calc.name }}</p>
+                                <p class="text-sm text-gray-600">Seguidores: {{ calc.followers }}</p>
+                                <p class="text-sm text-gray-600">Escopo: {{ calc.scope === 'small' ? 'Pequeno' : 'Grande' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-800">Stories: R$ {{ formatCurrency(calc.storiesValue) }}</p>
+                                <p class="text-sm font-medium text-gray-800">Reels: R$ {{ formatCurrency(calc.reelsValue) }}</p>
+                                <p class="text-xs text-gray-500">{{ new Date(calc.timestamp).toLocaleString() }}</p>
+                                <button 
+                                    @click="reloadCalculation(calc)"
+                                    class="mt-2 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                                >
+                                    Recarregar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import db from '/src/lib/db.js';
+
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    followers: 0,
+                    loading: false,
+                    showHistory: false,
+                    showSaveDialog: false,
+                    saveName: '',
+                    history: [],
+                    scope: 'small',
+                    minReach: 5,
+                    maxReach: 50,
+                    engagement: 0,
+                    licenseDays: 1,
+                    hasDiscount: 'no',
+                    lastSavedAt: null
+                }
+            },
+            mounted() {
+                // Load saved calculations from localStorage
+                this.history = JSON.parse(localStorage.getItem('influencerCalculations') || '[]');
+            },
+            computed: {
+                baseValue() {
+                    const ratePerFollower = this.scope === 'small' ? 0.014 : 0.008
+                    return this.followers * ratePerFollower
+                },
+                minReachValue() {
+                    const reach = this.followers * (this.minReach / 100)
+                    return (reach * 8) / 1000
+                },
+                maxReachValue() {
+                    const reach = this.followers * (this.maxReach / 100)
+                    return (reach * 10) / 1000
+                },
+                licenseValue() {
+                    const baseRate = 13.32
+                    const followersInUnits = this.followers / 50000
+                    return baseRate * followersInUnits * this.licenseDays
+                },
+                totalValue() {
+                    return this.baseValue + this.minReachValue + this.maxReachValue + this.licenseValue
+                },
+                finalValue() {
+                    return this.hasDiscount === 'yes' ? this.totalValue * 0.9 : this.totalValue
+                },
+                finalReelsValue() {
+                    const reelsValue = this.totalValue * 2
+                    return this.hasDiscount === 'yes' ? reelsValue * 0.9 : reelsValue
+                }
+            },
+            methods: {
+                showSavePrompt() {
+                    this.showSaveDialog = true;
+                    this.saveName = '';
+                },
+                cancelSave() {
+                    this.showSaveDialog = false;
+                    this.saveName = '';
+                },
+                async saveCalculation() {
+                    if (!this.saveName.trim()) {
+                        alert('Por favor, digite um nome para o cálculo');
+                        return;
+                    }
+
+                    try {
+                        this.loading = true;
+                        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                        
+                        const calculationData = {
+                            user_id: currentUser.id,
+                            name: this.saveName.trim(),
+                            type: 'instagram',
+                            data: {
+                                followers: this.followers,
+                                scope: this.scope,
+                                minReach: this.minReach,
+                                maxReach: this.maxReach,
+                                engagement: this.engagement,
+                                licenseDays: this.licenseDays,
+                                storiesValue: this.totalValue,
+                                reelsValue: this.totalValue * 2,
+                                hasDiscount: this.hasDiscount
+                            }
+                        };
+
+                        await db.createCalculation(calculationData);
+                        
+                        this.lastSavedAt = new Date().toLocaleTimeString();
+                        this.showSaveDialog = false;
+                        this.saveName = '';
+                        
+                        await this.loadHistory();
+                    } catch (error) {
+                        console.error('Erro ao salvar cálculo:', error);
+                        alert('Erro ao salvar o cálculo');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                async loadHistory() {
+                    try {
+                        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                        const calculations = await db.getCalculationsByUser(currentUser.id);
+                        this.history = calculations
+                            .filter(calc => calc.type === 'instagram')
+                            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                            .slice(0, 5);
+                    } catch (error) {
+                        console.error('Erro ao carregar histórico:', error);
+                    }
+                },
+
+                toggleHistory() {
+                    this.showHistory = !this.showHistory;
+                },
+                formatCurrency(value) {
+                    return value.toFixed(2)
+                },
+                reloadCalculation(calc) {
+                    this.followers = calc.followers;
+                    this.scope = calc.scope;
+                    this.minReach = calc.minReach;
+                    this.maxReach = calc.maxReach;
+                    this.engagement = calc.engagement;
+                    this.licenseDays = calc.licenseDays;
+                    this.hasDiscount = calc.hasDiscount || 'no';
+                    this.showHistory = false;
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

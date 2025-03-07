@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferramentas para Streams</title>
+    <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-[#04456c] via-[#391334] to-[#04244c]">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-white">Ferramentas para Streams</h1>
+            <div class="flex gap-4">
+                <button 
+                    @click="goToProfile"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    Perfil
+                </button>
+                <button 
+                    @click="logout"
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                    Sair
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex gap-4 mb-8">
+            <button 
+                @click="goBack"
+                class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+                Voltar
+            </button>
+            <button 
+                @click="goToHome"
+                class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+                Início
+            </button>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <button
+                @click="goToGC"
+                class="group relative p-6 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl text-white text-xl font-bold hover:opacity-90 transition-all overflow-hidden"
+            >
+                <div class="relative z-10">
+                    <h3 class="text-2xl mb-2">GC para Stream</h3>
+                    <p class="text-sm font-normal opacity-80">
+                        Gerencie seus overlays e alertas de stream com facilidade
+                    </p>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+            </button>
+            
+            <button
+                @click="goToCollab"
+                class="group relative p-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl text-white text-xl font-bold hover:opacity-90 transition-all overflow-hidden"
+            >
+                <div class="relative z-10">
+                    <h3 class="text-2xl mb-2">Collab Board</h3>
+                    <p class="text-sm font-normal opacity-80">
+                        Quadro colaborativo para planejamento de streams e eventos
+                    </p>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+            </button>
+            
+            <button
+                @click="goToRPG"
+                class="group relative p-6 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl text-white text-xl font-bold hover:opacity-90 transition-all overflow-hidden md:col-span-2"
+            >
+                <div class="relative z-10">
+                    <h3 class="text-2xl mb-2">Sistema para Portraits de RPG</h3>
+                    <p class="text-sm font-normal opacity-80">
+                        Crie e gerencie portraits para suas campanhas de RPG
+                    </p>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+            </button>
+        </div>
+
+        <!-- Coming Soon Notice -->
+        <div class="mt-8 p-4 bg-white/10 backdrop-blur-sm rounded-lg">
+            <p class="text-white text-center">
+                🚀 Novas ferramentas em desenvolvimento! Fique ligado para mais novidades.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    user: null
+                }
+            },
+            mounted() {
+                // Check authentication
+                if (!localStorage.getItem('isLoggedIn')) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                // Get user data
+                try {
+                    this.user = JSON.parse(localStorage.getItem('currentUser'));
+                } catch (error) {
+                    console.error('Erro ao carregar usuário:', error);
+                    this.logout();
+                }
+            },
+            methods: {
+                goToGC() {
+                    // Will be implemented later
+                    alert('Em desenvolvimento! Em breve disponível.');
+                },
+                goToCollab() {
+                    // Will be implemented later
+                    alert('Em desenvolvimento! Em breve disponível.');
+                },
+                goToRPG() {
+                    window.location.href = '/rpg-portraits.html';
+                },
+                goBack() {
+                    window.history.back();
+                },
+                goToHome() {
+                    window.location.href = '/home.html';
+                },
+                goToProfile() {
+                    window.location.href = '/profile.html';
+                },
+                logout() {
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = '/login.html';
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

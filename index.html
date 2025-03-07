@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DinoRaw Calculator</title>
+    <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
+    <link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+    <script type="module">
+        // Redirect to login if not authenticated
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = './login.html';
+        } else {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            window.location.href = user.role === 'admin' ? './admin-panel.html' : './home.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+    <script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body class="min-h-screen bg-gradient-to-br from-[#04456c] via-[#391334] to-[#04244c]">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <!-- Navigation -->
+        <div class="flex gap-4 mb-8">
+            <button 
+                @click="goBack"
+                class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+                Voltar
+            </button>
+            <button 
+                @click="goToHome"
+                class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+                Início
+            </button>
+        </div>
+
+        <!-- Profile Form -->
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-xl p-8">
+            <h1 class="text-2xl font-bold mb-6">Configurações do Perfil</h1>
+            
+            <form @submit.prevent="saveProfile" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Usuário</label>
+                    <input 
+                        type="text" 
+                        v-model="profile.username" 
+                        required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nome</label>
+                    <input 
+                        type="text" 
+                        v-model="profile.name" 
+                        required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">E-mail</label>
+                    <input 
+                        type="email" 
+                        v-model="profile.email" 
+                        required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nova Senha (deixe em branco para manter a atual)</label>
+                    <input 
+                        type="password" 
+                        v-model="newPassword"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                </div>
+
+                <div v-if="error" class="text-sm text-red-600">
+                    {{ error }}
+                </div>
+
+                <div v-if="success" class="text-sm text-green-600">
+                    {{ success }}
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <button 
+                        type="button"
+                        @click="logout"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                        Sair
+                    </button>
+                    <button 
+                        type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        :disabled="loading"
+                    >
+                        {{ loading ? 'Salvando...' : 'Salvar Alterações' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from '/src/lib/supabase.js';
+
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    profile: {
+                        username: '',
+                        name: '',
+                        email: ''
+                    },
+                    newPassword: '',
+                    error: '',
+                    success: '',
+                    loading: false
+                }
+            },
+            async mounted() {
+                await this.checkSession();
+            },
+            methods: {
+                async checkSession() {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+
+                    try {
+                        const { data: profile, error } = await supabase
+                            .from('profiles')
+                            .select('*')
+                            .eq('id', session.user.id)
+                            .single();
+
+                        if (error) throw error;
+
+                        this.profile = profile;
+                        localStorage.setItem('currentUser', JSON.stringify(profile));
+                    } catch (error) {
+                        console.error('Erro ao carregar perfil:', error);
+                        this.error = 'Falha ao carregar dados do perfil';
+                    }
+                },
+                async saveProfile() {
+                    this.loading = true;
+                    this.error = '';
+                    this.success = '';
+
+                    try {
+                        // Update auth email/password if changed
+                        if (this.newPassword || this.profile.email !== this.profile.email) {
+                            const { error: authError } = await supabase.auth.updateUser({
+                                email: this.profile.email,
+                                password: this.newPassword || undefined
+                            });
+
+                            if (authError) throw authError;
+                        }
+
+                        // Update profile
+                        const { data: updatedProfile, error: profileError } = await supabase
+                            .from('profiles')
+                            .update({
+                                username: this.profile.username,
+                                name: this.profile.name,
+                                email: this.profile.email,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', this.profile.id)
+                            .select()
+                            .single();
+
+                        if (profileError) throw profileError;
+
+                        this.profile = updatedProfile;
+                        localStorage.setItem('currentUser', JSON.stringify(updatedProfile));
+                        this.success = 'Perfil atualizado com sucesso';
+                        this.newPassword = '';
+                    } catch (error) {
+                        console.error('Erro ao salvar perfil:', error);
+                        this.error = 'Falha ao salvar alterações do perfil';
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                async logout() {
+                    try {
+                        await supabase.auth.signOut();
+                        localStorage.removeItem('currentUser');
+                        window.location.href = '/login.html';
+                    } catch (error) {
+                        console.error('Erro ao fazer logout:', error);
+                    }
+                },
+                goBack() {
+                    window.history.back();
+                },
+                goToHome() {
+                    window.location.href = '/home.html';
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
